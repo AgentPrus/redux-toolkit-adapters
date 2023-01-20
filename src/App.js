@@ -1,8 +1,10 @@
 import React from "react";
-import "rsuite/dist/styles/rsuite-dark.css";
+import "rsuite/dist/rsuite.css";
+
+import Comments from "./features/comments/Comments";
 
 function App() {
-  return <div></div>;
+  return <Comments />;
 }
 
 export default App;
