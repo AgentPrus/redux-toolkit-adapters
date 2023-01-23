@@ -14,12 +14,25 @@ export const fetchComments = createAsyncThunk(
 );
 
 export const deleteComment = createAsyncThunk(
-  "comments/delete/Comment",
+  "comments/deleteComment",
   async (id) => {
     await fetch(`https://jsonplaceholder.typicode.com/comments/${id}`, {
       method: "DELETE",
     });
     return id;
+  }
+);
+
+export const patchComment = createAsyncThunk(
+  "comments/editComment",
+  async ({ id, newData }) => {
+    console.log(newData);
+    await fetch(`https://jsonplaceholder.typicode.com/comments/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(newData),
+    }).then((res) => res.json());
+
+    return { id, changes: newData };
   }
 );
 
@@ -30,7 +43,12 @@ const commentsAdapter = createEntityAdapter({
 const commentsSlice = createSlice({
   name: "comments",
   initialState: commentsAdapter.getInitialState({ loading: false }),
-  reducers: {},
+  reducers: {
+    setAllComments: commentsAdapter.setAll,
+    setOneComment: commentsAdapter.setOne,
+    setManyComments: commentsAdapter.setMany,
+    updateOneComment: commentsAdapter.updateOne,
+  },
   extraReducers: {
     [fetchComments.pending](state) {
       state.loading = true;
@@ -52,11 +70,29 @@ const commentsSlice = createSlice({
       state.loading = false;
       commentsAdapter.removeOne(state, id);
     },
+    [patchComment.pending](state) {
+      state.loading = true;
+    },
+    [patchComment.fulfilled](state, { payload }) {
+      state.loading = false;
+
+      commentsAdapter.updateOne(state, {
+        id: payload.id,
+        changes: payload.changes,
+      });
+    },
   },
 });
 
 export const commentsSelectors = commentsAdapter.getSelectors(
   (state) => state.comments
 );
+
+export const {
+  setAllComments,
+  setOneComment,
+  setManyComments,
+  updateOneComment,
+} = commentsSlice.actions;
 
 export default commentsSlice.reducer;

@@ -6,6 +6,7 @@ import {
   commentsSelectors,
   fetchComments,
   deleteComment,
+  patchComment,
 } from "./commentsSlice";
 import Comment from "./components/Comment";
 
@@ -20,6 +21,12 @@ const Comments = () => {
     },
     [dispatch]
   );
+  const handleEdit = useCallback(
+    (id, newData) => {
+      dispatch(patchComment({ id, newData }));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     dispatch(fetchComments());
@@ -29,7 +36,14 @@ const Comments = () => {
     <div className="dark">
       {allComments.map((comment) => {
         return (
-          <Comment key={comment.id} comment={comment} onDelete={handleDelete} />
+          <Comment
+            key={comment.id}
+            body={comment.body}
+            name={comment.name}
+            id={comment.id}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
         );
       })}
     </div>
